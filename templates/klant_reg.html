@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Klant Registratie</h1>
+{% from "includes/_formhelpers.html" import render_field %}
+<form method="post" action="">
+    <div class="form-group">
+        {{render_field(form.voornaam, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.achternaam, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.adres, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.telefoon, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.rek_num, class_="form-control")}}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+</form>
+{% endblock %}
