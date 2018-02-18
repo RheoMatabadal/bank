@@ -3,26 +3,33 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
-
-
+import datetime
+import os
 app = Flask(__name__)
 
-
-#config MySQL
+mysql = MySQL()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'bank'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-#init MySQL
-mysql = MySQL(app)
+mysql.init_app(app)
+
 
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/home')
+def home():
     return render_template('home.html')
+
+t@app.route('/home2')
+def home2():
+    return render_template('home2.html')
+
 
 @app.route('/munten')
 def munten():
@@ -39,6 +46,11 @@ def overzichten():
 @app.route('/klanten')
 def klanten():
     return render_template('klanten.html')
+
+@app.route('/klanten_reg')
+def klanten_reg():
+    return render_template('klanten_reg.html')
+
 
 class KlantRegistratie(Form):
     voornaam = StringField('voornaam',[validators.length(min=1, max=50)])
@@ -69,10 +81,31 @@ def registreer():
         #close connection
         cur.close()
 
-        flash('klant is toegevoegd', 'success')
+        #flash('klant is toegevoegd', 'success')
 
-        redirect(url_for(index))
-    return render_template('klant_reg.html', form=form)
+    #return render_template('klanten.html')
+    return render_template('klant.html', form=form)
+
+
+@app.route('/validatie', methods=['POST'])
+def validatie():
+    naam = str(request.form['naam'])
+    wachtwoord = str(request.form['wachtwoord'])
+
+    try:
+        cursor = mysql.connect.cursor()
+        cursor.execute("SELECT * FROM users WHERE naam='"+ naam+"' AND wachtwoord= '"+ wachtwoord + "'")
+        user = cursor.fetchone()
+
+        if user[1] == 1:
+            return redirect(url_for('home'))
+        elif user[1] == 2:
+            return redirect(url_for('home2'))
+        else:
+            return "fout geconstateerd"
+
+    except Exception as e:
+        return e
 
 if __name__=='__main__':
     app.secret_key='secret123'
